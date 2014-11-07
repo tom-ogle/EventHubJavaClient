@@ -1,0 +1,6 @@
+.idea
+*.class
+target
+.DS_Store
+Thumbs.db
+*.iml
