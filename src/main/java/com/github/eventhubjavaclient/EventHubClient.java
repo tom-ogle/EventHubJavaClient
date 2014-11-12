@@ -2,13 +2,16 @@ package com.github.eventhubjavaclient;
 
 import com.github.eventhubjavaclient.exception.BadlyFormedResponseBodyException;
 import com.github.eventhubjavaclient.exception.UnexpectedResponseCodeException;
-import com.owlike.genson.Genson;
-import com.owlike.genson.JsonBindingException;
+import com.google.gson.Gson;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -41,13 +44,15 @@ public class EventHubClient {
   private static final String EVENT_KEYS_PATH = "/events/keys";
   private static final String EVENT_TYPES_PATH = "/events/types";
   private static final String EVENT_VALUES_PATH = "/events/values";
+  private static final String EVENT_FUNNEL_PATH = "/events/funnel";
 
   private static final int[] OK_RESPONSE = new int[] {200};
 
   // Instance
 
+  private static DateTimeFormatter eventHubDateFormatter = DateTimeFormat.forPattern("yyyyMMdd");
   private WebResource webResource;
-  private Genson genson = new Genson();
+  private Gson gson = new Gson();
 
   private EventHubClient(String baseUrl, ClientConfig config) {
     Client client = Client.create(config);
@@ -66,7 +71,7 @@ public class EventHubClient {
     ClientResponse response = webResource.path(USER_KEYS_PATH).accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
     checkResponseCode(response,OK_RESPONSE);
     String body = response.getEntity(String.class);
-    return extractArray(body);
+    return extractStringArray(body);
   }
 
   /**
@@ -91,7 +96,7 @@ public class EventHubClient {
     ClientResponse response = request.get(ClientResponse.class);
     checkResponseCode(response,OK_RESPONSE);
     String body = response.getEntity(String.class);
-    return extractArray(body);
+    return extractStringArray(body);
   }
 
   // Events
@@ -103,14 +108,14 @@ public class EventHubClient {
                                          .get(ClientResponse.class);
     checkResponseCode(response,OK_RESPONSE);
     String body = response.getEntity(String.class);
-    return extractArray(body);
+    return extractStringArray(body);
   }
 
   public String[] getEventTypes() throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException {
     ClientResponse response = webResource.path(EVENT_TYPES_PATH).accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
     checkResponseCode(response,OK_RESPONSE);
     String body = response.getEntity(String.class);
-    return extractArray(body);
+    return extractStringArray(body);
   }
 
   public String[] getEventValues(final String eventType, final String eventKey)
@@ -129,22 +134,44 @@ public class EventHubClient {
     ClientResponse response = request.get(ClientResponse.class);
     checkResponseCode(response,OK_RESPONSE);
     String body = response.getEntity(String.class);
-    return extractArray(body);
+    return extractStringArray(body);
+  }
+
+  // Event funnel
+
+  public int[] getEventFunnelCounts(final DateTime startDate, final DateTime endDate, final String[] funnelSteps,
+      final int daysToCompleteFunnel) throws BadlyFormedResponseBodyException {
+
+    String body = produceFunnelCountsBody(startDate,endDate,funnelSteps,daysToCompleteFunnel);
+    ClientResponse response = webResource.path(EVENT_FUNNEL_PATH)
+                                         .header("Content-Type", "application/x-www-form-urlencoded")
+                                         .accept(MediaType.APPLICATION_JSON_TYPE)
+                                         .post(ClientResponse.class, body);
+    String responseBody = response.getEntity(String.class);
+    return gson.fromJson(responseBody,int[].class);
   }
 
   // Utils
 
-  private String[] extractArray(final String body) throws BadlyFormedResponseBodyException {
+  private static String produceFunnelCountsBody(final DateTime startDate, final DateTime endDate, final String[] funnelSteps
+      ,final int daysToCompleteFunnel) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("start_date=").append(startDate.toString(eventHubDateFormatter))
+      .append("&end_date=").append(endDate.toString(eventHubDateFormatter));
+    for(String funnelStep : funnelSteps) {
+      sb.append("&funnel_steps[]=").append(funnelStep);
+    }
+    sb.append("&num_days_to_complete_funnel=").append(daysToCompleteFunnel);
+    return sb.toString();
+  }
+
+  private String[] extractStringArray(final String body) throws BadlyFormedResponseBodyException {
     if(body == null || "".equals(body))
       throw new BadlyFormedResponseBodyException("Response body was null");
-    try {
-      String[] result = genson.deserialize(body, String[].class);
-      if(result==null)
-        throw new BadlyFormedResponseBodyException("Could not extract array from response body");
-      return result;
-    } catch(JsonBindingException e) {
-      throw new BadlyFormedResponseBodyException("Response body was badly formed JSON",e);
-    }
+    String[] result = gson.fromJson(body, String[].class);
+    if(result==null)
+      throw new BadlyFormedResponseBodyException("Could not extract array from response body");
+    return result;
   }
 
   private void checkResponseCode(ClientResponse response, int[] expectedStatusArray) throws UnexpectedResponseCodeException {
