@@ -9,7 +9,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  *
  */
-public class FactoryMethodTests {
+public class FactoryMethodTest {
 
   private static final String GOOD_URL = "http://someurl";
   private static final String BAD_URL = "some bad url";

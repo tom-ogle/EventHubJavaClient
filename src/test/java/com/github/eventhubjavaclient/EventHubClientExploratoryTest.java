@@ -26,7 +26,8 @@ public class EventHubClientExploratoryTest  {
 
       // Funnel
       int[] funnelCounts =
-          client.getEventFunnelCounts(new DateTime(2014,11,11,0,0),new DateTime(2014,11,25,0,0),new String[] {"pageview", "signup", "submission"},7);
+          client.retrieveEventFunnelCounts(new DateTime(2014, 11, 11, 0, 0), new DateTime(2014, 11, 25, 0, 0),
+              new String[] { "pageview", "signup", "submission" }, 7);
       System.out.printf("");
     } catch(UnexpectedResponseCodeException e) {
       System.out.printf("Actual response code was: "+e.getActualCode());

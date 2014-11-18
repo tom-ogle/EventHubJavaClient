@@ -3,6 +3,7 @@ package com.github.eventhubjavaclient;
 import com.github.eventhubjavaclient.exception.BadlyFormedResponseBodyException;
 import com.github.eventhubjavaclient.exception.UnexpectedResponseCodeException;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -137,18 +138,24 @@ public class EventHubClient {
     return extractStringArray(body);
   }
 
+  public void trackEvent() {
+
+
+  }
+
   // Event funnel
 
-  public int[] getEventFunnelCounts(final DateTime startDate, final DateTime endDate, final String[] funnelSteps,
-      final int daysToCompleteFunnel) throws BadlyFormedResponseBodyException {
+  public int[] retrieveEventFunnelCounts(final DateTime startDate, final DateTime endDate, final String[] funnelSteps,
+      final int daysToCompleteFunnel) throws BadlyFormedResponseBodyException, UnexpectedResponseCodeException {
 
     String body = produceFunnelCountsBody(startDate,endDate,funnelSteps,daysToCompleteFunnel);
     ClientResponse response = webResource.path(EVENT_FUNNEL_PATH)
                                          .header("Content-Type", "application/x-www-form-urlencoded")
                                          .accept(MediaType.APPLICATION_JSON_TYPE)
                                          .post(ClientResponse.class, body);
+    checkResponseCode(response,OK_RESPONSE);
     String responseBody = response.getEntity(String.class);
-    return gson.fromJson(responseBody,int[].class);
+    return extractIntArray(responseBody);
   }
 
   // Utils
@@ -166,12 +173,34 @@ public class EventHubClient {
   }
 
   private String[] extractStringArray(final String body) throws BadlyFormedResponseBodyException {
-    if(body == null || "".equals(body))
-      throw new BadlyFormedResponseBodyException("Response body was null");
-    String[] result = gson.fromJson(body, String[].class);
+    checkForBadBody(body);
+    String[] result = null;
+    try {
+      result = gson.fromJson(body, String[].class);
+    } catch(JsonSyntaxException e) {
+      throw new BadlyFormedResponseBodyException(e);
+    }
     if(result==null)
       throw new BadlyFormedResponseBodyException("Could not extract array from response body");
     return result;
+  }
+
+  private int[] extractIntArray(final String body) throws BadlyFormedResponseBodyException {
+    checkForBadBody(body);
+    int[] result =  null;
+    try {
+      result = gson.fromJson(body, int[].class);
+    } catch(JsonSyntaxException e) {
+      throw new BadlyFormedResponseBodyException("Badly formed response",e);
+    }
+    if(result==null)
+      throw new BadlyFormedResponseBodyException("Could not extract array from response body");
+    return result;
+  }
+
+  private void checkForBadBody(final String body) throws BadlyFormedResponseBodyException {
+    if(body == null || "".equals(body))
+      throw new BadlyFormedResponseBodyException("Response body was null");
   }
 
   private void checkResponseCode(ClientResponse response, int[] expectedStatusArray) throws UnexpectedResponseCodeException {

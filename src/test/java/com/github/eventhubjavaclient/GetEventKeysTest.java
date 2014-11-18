@@ -59,9 +59,9 @@ public class GetEventKeysTest extends EventHubClientTestBase {
   @Test(expected = UnexpectedResponseCodeException.class)
   public void testShouldThrowUnexpectedResponseCodeExceptionOn500Response() throws Exception {
     mockClientResponse(500,null);
-
     client.getEventKeys(SOME_STRING);
   }
+
 
   @Test(expected = BadlyFormedResponseBodyException.class)
   public void testShouldThrowBadlyFormedResponseBodyExceptionForBadlyFormedResponseBody() throws Exception {
@@ -72,16 +72,20 @@ public class GetEventKeysTest extends EventHubClientTestBase {
   }
 
   @Test(expected = BadlyFormedResponseBodyException.class)
+  public void testShouldThrowBadlyFormedResponseBodyExceptionForBadlyFormedResponseBodyObject() throws Exception {
+    mockClientResponse(200,"{badlyformedresponsebody}");
+    client.getEventKeys(SOME_STRING);
+  }
+
+  @Test(expected = BadlyFormedResponseBodyException.class)
   public void testShouldThrowBadlyFormedResponseBodyExceptionForEmptyReturnBody() throws Exception {
     mockClientResponse(200,"");
-
     client.getEventKeys(SOME_STRING);
   }
 
   @Test(expected = BadlyFormedResponseBodyException.class)
   public void testShouldThrowBadlyFormedResponseBodyExceptionForNullReturnBody() throws Exception {
     mockClientResponse(200,null);
-
     client.getEventKeys(SOME_STRING);
   }
 }
