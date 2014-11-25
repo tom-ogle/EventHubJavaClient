@@ -33,6 +33,7 @@ public class EventHubClientTestBase {
       webResource.get(ClientResponse.class); result = response;
       // Mock Post request
       builder.post(ClientResponse.class,anyString); result = response;
+      builder.post(ClientResponse.class); result = response;
       // Mock the response
       response.getStatus(); result = responseReturnCode;
       response.getEntity(String.class); result = responseBody;
