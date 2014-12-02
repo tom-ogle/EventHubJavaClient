@@ -21,6 +21,5 @@ public class TrackEventTest extends EventHubClientTestBase {
   }
 
   public void makeClientRequest() throws UnexpectedResponseCodeException {
-    client.trackEvent("myEvent","external_user_id");
   }
 }

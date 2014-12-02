@@ -2,6 +2,7 @@ package com.github.eventhubjavaclient.event;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.joda.time.DateTime;
 import org.junit.Before;
 
 import java.util.*;
@@ -10,6 +11,8 @@ import java.util.*;
  *
  */
 public class EventSerializationTestBase {
+
+  private static final DateTime DATE = new DateTime(2014,11,22,0,0);
 
   @Before
   public void setUp() {
@@ -33,7 +36,7 @@ public class EventSerializationTestBase {
   private static Event constructExpectedEvent1Property() {
     Map<String,String> expectedProperties = new TreeMap<String, String>();
     expectedProperties.put("exercise","homepage_1");
-    return new Event("submission","generated_id_123","20141122",expectedProperties);
+    return new Event("submission","generated_id_123",DATE,expectedProperties);
   }
 
   protected static final Event EVENT_2_PROPERTIES = constructExpectedEvent2Properties();
@@ -50,7 +53,7 @@ public class EventSerializationTestBase {
     Map<String,String> expectedProperties = new TreeMap<String, String>();
     expectedProperties.put("experiment","signup_v1");
     expectedProperties.put("treatment","control");
-    return new Event("signup","generated_id_123","20141122",expectedProperties);
+    return new Event("signup","generated_id_123",DATE,expectedProperties);
   }
 
   protected static final Event EVENT_0_PROPERTIES = constructExpectedEvent0Properties();
@@ -63,7 +66,7 @@ public class EventSerializationTestBase {
 
   private static Event constructExpectedEvent0Properties() {
     Map<String,String> expectedProperties = new TreeMap<String, String>();
-    return new Event("email_sent","generated_id_123","20141122",expectedProperties);
+    return new Event("email_sent","generated_id_123",DATE,expectedProperties);
   }
 
   protected static final Event EVENT_NO_DATE = constructExpectedEventNoDate();
@@ -87,7 +90,7 @@ public class EventSerializationTestBase {
 
   private static Event constructExpectedEventNoEventType() {
     Map<String,String> expectedProperties = new TreeMap<String, String>();
-    return new Event(null,"generated_id_123","20141122",expectedProperties);
+    return new Event(null,"generated_id_123",DATE,expectedProperties);
   }
 
   protected static final Event EVENT_NO_USER_ID = constructExpectedEventNoUserId();
@@ -99,7 +102,7 @@ public class EventSerializationTestBase {
 
   private static Event constructExpectedEventNoUserId() {
     Map<String,String> expectedProperties = new TreeMap<String, String>();
-    return new Event("email_sent",null,"20141122",expectedProperties);
+    return new Event("email_sent",null,DATE,expectedProperties);
   }
 
 //  protected static Collection<Event> ALL_EVENTS;

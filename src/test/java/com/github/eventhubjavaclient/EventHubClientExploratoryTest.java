@@ -35,13 +35,6 @@ public class EventHubClientExploratoryTest  {
       int[] funnelCounts =
           client.retrieveEventFunnelCounts(new DateTime(2014, 11, 11, 0, 0), new DateTime(2014, 11, 25, 0, 0),
               new String[] { "pageview", "signup", "submission" }, 7);
-      client.trackEvent("email_sent","generated_id_123");
-      client.trackEvent("email_sent","generated_id_123",new DateTime(2014,11,11,0,0));
-      MultivaluedMap<String,String> params = new MultivaluedMapImpl();
-      params.add("testparam1","value1");
-      params.add("testparam2","value2");
-      client.trackEvent("email_sent","generated_id_123",new DateTime(2014,11,11,0,0),params);
-      client.trackEvent("email_sent","generated_id_123",params);
       MultivaluedMap<String, String> userFields = new MultivaluedMapImpl();
       userFields.add("my_key","my_field");
       client.addOrUpdateUser("my_user1", userFields);
@@ -58,10 +51,10 @@ public class EventHubClientExploratoryTest  {
       int[][] eventCohortTable = client.retrieveEventCohortTable(new DateTime(2014, 11, 11, 0, 0), new DateTime(2014, 11, 25, 0, 0),
           "signup","submission",7,2,rowFilters,null);
 
-//      Map<String, String> properties = new HashMap<String, String>();
-//      properties.put("experiment","signup_v50");
-//      Event event = new Event("myeventtype","chengtao1@codecademy.com",properties);
-//      client.trackEvent(event);
+      Map<String, String> properties = new HashMap<String, String>();
+      properties.put("experiment","signup_v50");
+      Event event = new Event("myeventtype","chengtao1@codecademy.com",properties);
+      client.trackEvent(event);
       System.out.printf("");
     } catch(UnexpectedResponseCodeException e) {
       System.out.printf("Actual response code was: "+e.getActualCode());

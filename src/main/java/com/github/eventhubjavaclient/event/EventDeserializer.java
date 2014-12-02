@@ -4,15 +4,15 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import org.joda.time.DateTime;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-/**
- *
- */
+import static com.github.eventhubjavaclient.EventHubClientUtils.EVENT_HUB_DATE_FORMATTER;
+
 public class EventDeserializer implements JsonDeserializer<Event> {
 
   public static final String KEY_EVENT_TYPE = "event_type";
@@ -25,7 +25,7 @@ public class EventDeserializer implements JsonDeserializer<Event> {
     final Map<String, String> properties = new HashMap<String, String>();
     String eventType = null;
     String externalUserId = null;
-    String date = null;
+    DateTime date = null;
     Set<Map.Entry<String, JsonElement>> entries = jsonElement.getAsJsonObject().entrySet();
     for(Map.Entry<String, JsonElement> entry : entries) {
       String key = entry.getKey();
@@ -35,7 +35,7 @@ public class EventDeserializer implements JsonDeserializer<Event> {
       else if(KEY_EXTERNAL_USER_ID.equals(key))
         externalUserId = value;
       else if(KEY_DATE.equals(key))
-        date = value;
+        date = EVENT_HUB_DATE_FORMATTER.parseDateTime(value);
       else
         properties.put(key,value);
     }

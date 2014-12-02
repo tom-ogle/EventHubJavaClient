@@ -12,9 +12,8 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -23,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
+import static com.github.eventhubjavaclient.EventHubClientUtils.EVENT_HUB_DATE_FORMATTER;
 /**
  *
  */
@@ -68,7 +67,6 @@ public class EventHubClient {
 
   // Instance
 
-  private static DateTimeFormatter eventHubDateFormatter = DateTimeFormat.forPattern("yyyyMMdd");
   private WebResource webResource;
   private Gson gson;
 
@@ -207,38 +205,24 @@ public class EventHubClient {
     return extractFromBody(responseBody,String[].class);
   }
 
-  public void trackEvent(final String eventType, final String externalUserId, final DateTime date,
-      final MultivaluedMap<String,String> additionalParams) throws UnexpectedResponseCodeException {
-
+  public void trackEvent(final Event event) throws UnexpectedResponseCodeException {
     WebResource resource = webResource.path(EVENT_TRACK_PATH)
-                                         .queryParam("event_type", eventType)
-                                         .queryParam("external_user_id", externalUserId);
+                                      .queryParam("event_type", event.getEventType())
+                                      .queryParam("external_user_id", event.getExternalUserId());
+    DateTime date = event.getDate();
     if(date!=null)
-      resource = resource.queryParam("date", date.toString(eventHubDateFormatter));
-    if(additionalParams!=null)
-      resource = resource.queryParams(additionalParams);
+      resource = resource.queryParam("date", date.toString(EVENT_HUB_DATE_FORMATTER));
+    Map<String,String> additionalParams = event.getUnmodifiablePropertyMap();
+    if(additionalParams!=null) {
+      for(Map.Entry<String, String> entry : additionalParams.entrySet()) {
+        resource = resource.queryParam(entry.getKey(),entry.getValue());
+      }
+    }
     ClientResponse response = resource.header("Content-Type", "application/x-www-form-urlencoded")
                                       .accept(MediaType.APPLICATION_JSON_TYPE)
                                       .post(ClientResponse.class);
     checkResponseCode(response,OK_RESPONSE);
   }
-
-  public void trackEvent(final String eventType, final String externalUserId, final DateTime date) throws UnexpectedResponseCodeException {
-    trackEvent(eventType,externalUserId,date,null);
-  }
-
-  public void trackEvent(final String eventType, final String externalUserId, final MultivaluedMap<String,String> additionalParams)
-      throws UnexpectedResponseCodeException {
-    trackEvent(eventType, externalUserId, null, additionalParams);
-  }
-
-  public void trackEvent(final String eventType, final String externalUserId) throws UnexpectedResponseCodeException {
-    trackEvent(eventType, externalUserId, null, null);
-  }
-
-//  public void trackEvent(final Event event) throws UnexpectedResponseCodeException {
-//    trackEvent(event.getEventType(),event.getExternalUserId(),event.getDate());
-//  }
 
   public void batchTrackEvent(final List<Event> events) throws UnexpectedResponseCodeException {
     // TODO: Implement
@@ -325,8 +309,8 @@ public class EventHubClient {
   }
 
   private static StringBuilder produceDateRangeRequestBody(final DateTime startDate, final DateTime endDate, final StringBuilder sb) {
-    sb.append("start_date=").append(startDate.toString(eventHubDateFormatter))
-      .append("&end_date=").append(endDate.toString(eventHubDateFormatter));
+    sb.append("start_date=").append(startDate.toString(EVENT_HUB_DATE_FORMATTER))
+      .append("&end_date=").append(endDate.toString(EVENT_HUB_DATE_FORMATTER));
     return sb;
   }
 

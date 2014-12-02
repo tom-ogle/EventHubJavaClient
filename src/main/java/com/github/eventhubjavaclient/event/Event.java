@@ -1,5 +1,7 @@
 package com.github.eventhubjavaclient.event;
 
+import org.joda.time.DateTime;
+
 import java.util.*;
 
 /**
@@ -8,10 +10,10 @@ import java.util.*;
 public class Event {
   private final String eventType;
   private final String externalUserId;
-  private String date;
+  private DateTime date;
   private Map<String, String> properties;
 
-  public Event(String eventType, String externalUserId, String date, Map<String, String> properties) {
+  public Event(String eventType, String externalUserId, DateTime date, Map<String, String> properties) {
     this.eventType = eventType;
     this.externalUserId = externalUserId;
     this.date = date;
@@ -32,7 +34,7 @@ public class Event {
     return externalUserId;
   }
 
-  public String getDate() {
+  public DateTime getDate() {
     return date;
   }
 
@@ -54,6 +56,10 @@ public class Event {
 
   public Set<Map.Entry<String, String>> getPropertyEntrySet() {
     return Collections.unmodifiableSet(properties.entrySet());
+  }
+
+  public Map<String, String> getUnmodifiablePropertyMap() {
+    return Collections.unmodifiableMap(properties);
   }
 
   @Override
