@@ -111,13 +111,8 @@ public class EventSerializationTestBase {
           + JSON_EVENT_NO_DATE + ",\n" + JSON_EVENT_NO_EVENT_TYPE + ",\n" + JSON_EVENT_NO_USER_ID
           + "]\n";
 
-//  protected static Map<String, Event> jsonToEventMap;
-//  protected static Map<Event,String > eventToJsonMap;
-
   static {
-    initializeEventMaps();
     initializeEventsInJsonOrder();
-//    ALL_EVENTS = jsonToEventMap.values();
   }
 
   private static void initializeEventsInJsonOrder() {
@@ -129,31 +124,6 @@ public class EventSerializationTestBase {
     ALL_EVENTS_SORTED_IN_JSON_ORDER.add(EVENT_NO_EVENT_TYPE);
     ALL_EVENTS_SORTED_IN_JSON_ORDER.add(EVENT_NO_USER_ID);
   }
-
-  protected static void initializeEventMaps() {
-//    initializeJsonToEventMap();
-//    initializeEventToJsonMap();
-  }
-
-//  protected static void initializeJsonToEventMap() {
-//    jsonToEventMap = new HashMap<String, Event>();
-//    jsonToEventMap.put(JSON_EVENT_1_PROPERTY, EVENT_1_PROPERTY);
-//    jsonToEventMap.put(JSON_EVENT_2_PROPERTIES, EVENT_2_PROPERTIES);
-//    jsonToEventMap.put(JSON_EVENT_0_PROPERTIES, EVENT_0_PROPERTIES);
-//    jsonToEventMap.put(JSON_EVENT_NO_DATE, EVENT_NO_DATE);
-//    jsonToEventMap.put(JSON_EVENT_NO_EVENT_TYPE, EVENT_NO_EVENT_TYPE);
-//    jsonToEventMap.put(JSON_EVENT_NO_USER_ID, EVENT_NO_USER_ID);
-//  }
-
-//  protected static void initializeEventToJsonMap() {
-//    eventToJsonMap = new HashMap<Event, String>();
-//    eventToJsonMap.put(EVENT_1_PROPERTY, JSON_EVENT_1_PROPERTY);
-//    eventToJsonMap.put(EVENT_2_PROPERTIES, JSON_EVENT_2_PROPERTIES);
-//    eventToJsonMap.put(EVENT_0_PROPERTIES, JSON_EVENT_0_PROPERTIES);
-//    eventToJsonMap.put(EVENT_NO_DATE, JSON_EVENT_NO_DATE);
-//    eventToJsonMap.put(EVENT_NO_EVENT_TYPE, JSON_EVENT_NO_EVENT_TYPE);
-//    eventToJsonMap.put(EVENT_NO_USER_ID, JSON_EVENT_NO_USER_ID);
-//  }
 
   protected static final Comparator<Event> eventComparator = new Comparator<Event>() {
     @Override public int compare(final Event event, final Event event2) {
