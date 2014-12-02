@@ -2,6 +2,7 @@ package com.github.eventhubjavaclient;
 
 import com.github.eventhubjavaclient.event.Event;
 import com.github.eventhubjavaclient.event.EventDeserializer;
+import com.github.eventhubjavaclient.event.EventSerializer;
 import com.github.eventhubjavaclient.exception.BadlyFormedResponseBodyException;
 import com.github.eventhubjavaclient.exception.UnexpectedResponseCodeException;
 import com.google.gson.*;
@@ -76,6 +77,7 @@ public class EventHubClient {
     webResource = client.resource(baseUrl);
     GsonBuilder gsonBuilder = new GsonBuilder();
     gsonBuilder.registerTypeAdapter(Event.class, new EventDeserializer());
+    gsonBuilder.registerTypeAdapter(Event.class, new EventSerializer());
     gson = gsonBuilder.create();
   }
 
@@ -234,11 +236,17 @@ public class EventHubClient {
     trackEvent(eventType, externalUserId, null, null);
   }
 
-  public void batchTrackEvent(final List<Event> events) {
+//  public void trackEvent(final Event event) throws UnexpectedResponseCodeException {
+//    trackEvent(event.getEventType(),event.getExternalUserId(),event.getDate());
+//  }
+
+  public void batchTrackEvent(final List<Event> events) throws UnexpectedResponseCodeException {
     // TODO: Implement
+
     ClientResponse response = webResource.path(EVENT_BATCH_TRACK_PATH)
                                          .header("Content-Type", "application/x-www-form-urlencoded")
                                          .post(ClientResponse.class);
+    checkResponseCode(response,OK_RESPONSE);
   }
 
   // Event cohort

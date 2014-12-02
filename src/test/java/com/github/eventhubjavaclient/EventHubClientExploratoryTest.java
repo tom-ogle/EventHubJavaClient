@@ -1,5 +1,6 @@
 package com.github.eventhubjavaclient;
 
+import com.github.eventhubjavaclient.event.Event;
 import com.github.eventhubjavaclient.exception.UnexpectedResponseCodeException;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.joda.time.DateTime;
@@ -56,6 +57,11 @@ public class EventHubClientExploratoryTest  {
       rowFilters.put("treatment", "control");
       int[][] eventCohortTable = client.retrieveEventCohortTable(new DateTime(2014, 11, 11, 0, 0), new DateTime(2014, 11, 25, 0, 0),
           "signup","submission",7,2,rowFilters,null);
+
+//      Map<String, String> properties = new HashMap<String, String>();
+//      properties.put("experiment","signup_v50");
+//      Event event = new Event("myeventtype","chengtao1@codecademy.com",properties);
+//      client.trackEvent(event);
       System.out.printf("");
     } catch(UnexpectedResponseCodeException e) {
       System.out.printf("Actual response code was: "+e.getActualCode());
