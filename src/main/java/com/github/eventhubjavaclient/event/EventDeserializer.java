@@ -15,9 +15,9 @@ import java.util.Set;
  */
 public class EventDeserializer implements JsonDeserializer<Event> {
 
-  private static final String KEY_EVENT_TYPE = "event_type";
-  private static final String KEY_EXTERNAL_USER_ID = "external_user_id";
-  private static final String KEY_DATE = "date";
+  public static final String KEY_EVENT_TYPE = "event_type";
+  public static final String KEY_EXTERNAL_USER_ID = "external_user_id";
+  public static final String KEY_DATE = "date";
 
   @Override public Event deserialize(final JsonElement jsonElement, final Type type,
       final JsonDeserializationContext jsonDeserializationContext)
