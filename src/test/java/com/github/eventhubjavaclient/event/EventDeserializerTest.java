@@ -64,32 +64,4 @@ public class EventDeserializerTest extends EventSerializationTestBase {
     Event actualEvent = gson.fromJson(jsonToConvert,Event.class);
     assertThatEventsHaveSameValues(expectedEvent, actualEvent);
   }
-
-  private void assertThatEventsHaveSameValues(final Event expectedEvent, final Event actualEvent) {
-    final String expectedEventType = expectedEvent.getEventType();
-    final String actualEventType = actualEvent.getEventType();
-    assertEquals(format("Expected event type was %s but actual was %s",expectedEventType,actualEventType),expectedEventType,actualEventType);
-
-    final String expectedExternalUserId = expectedEvent.getExternalUserId();
-    final String actualExternalUserId = actualEvent.getExternalUserId();
-    assertEquals(format("Expected external user ID was %s but actual was %s",expectedExternalUserId,actualExternalUserId)
-        ,expectedExternalUserId,actualExternalUserId);
-
-    final Set<Map.Entry<String, String>> expectedEventPropertyEntrySet = expectedEvent.getPropertyEntrySet();
-    final Set<Map.Entry<String, String>> actualEventPropertyEntrySet = actualEvent.getPropertyEntrySet();
-    assertEquals("Expected and actual Event properties were not equal",expectedEventPropertyEntrySet,actualEventPropertyEntrySet);
-
-    final DateTime expectedDateTime = expectedEvent.getDate();
-    final DateTime actualDateTime = actualEvent.getDate();
-    if(expectedDateTime==null || actualDateTime==null) {
-      assertNull("actualDateTime was null but expectedDateTime wasn't",expectedDateTime);
-      assertNull("expectedDateTime was null but actualDateTime wasn't",actualDateTime);
-      return;
-    }
-
-    final String expectedDateTimeString = expectedDateTime.toString(EVENT_HUB_DATE_FORMATTER);
-    final String actualDateTimeString = actualDateTime.toString(EVENT_HUB_DATE_FORMATTER);
-    assertEquals(expectedDateTimeString,actualDateTimeString);
-  }
-
 }

@@ -35,8 +35,8 @@ public class EventHubClientExploratoryTest  {
       int[] funnelCounts =
           client.retrieveEventFunnelCounts(new DateTime(2014, 11, 11, 0, 0), new DateTime(2014, 11, 25, 0, 0),
               new String[] { "pageview", "signup", "submission" }, 7);
-      MultivaluedMap<String, String> userFields = new MultivaluedMapImpl();
-      userFields.add("my_key","my_field");
+      Map<String, String> userFields = new HashMap<String, String>();
+      userFields.put("my_key","my_field");
       client.addOrUpdateUser("my_user1", userFields);
       client.aliasUser("another_user_alias", "my_user1");
       client.getUserTimeline("chengtao@codecademy.com", 1, 10);

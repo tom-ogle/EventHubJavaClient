@@ -81,11 +81,19 @@ public class EventHubClient {
 
   // Users
 
-  public void addOrUpdateUser(final String userId, final MultivaluedMap<String,String> userFields) throws UnexpectedResponseCodeException {
-    ClientResponse response = webResource.path(USER_ADD_OR_UPDATE_PATH)
-                                         .queryParam("external_user_id", userId)
-                                         .queryParams(userFields)
-                                         .post(ClientResponse.class);
+  /**
+   * Adds the user if they don't exist and updates their properties if they do exist.
+   * @param userId The userID to update, must be NotNull
+   * @param userFieldValueMap The key-value pairs to attach to this user. Must be NotNull and should contain values.
+   * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API
+   */
+  public void addOrUpdateUser(final String userId, final Map<String,String> userFieldValueMap) throws UnexpectedResponseCodeException {
+    WebResource resource = webResource.path(USER_ADD_OR_UPDATE_PATH)
+                                         .queryParam("external_user_id", userId);
+    for(Map.Entry<String, String> entry : userFieldValueMap.entrySet()) {
+      resource = resource.queryParam(entry.getKey(),entry.getValue());
+    }
+    ClientResponse response = resource.post(ClientResponse.class);
     checkResponseCode(response,OK_RESPONSE);
   }
 
@@ -144,7 +152,8 @@ public class EventHubClient {
     checkResponseCode(response,OK_RESPONSE);
   }
 
-  public Collection<Event> getUserTimeline(final String userName, final int offset, final int numberOfRecords) throws UnexpectedResponseCodeException {
+  public Collection<Event> getUserTimeline(final String userName, final int offset, final int numberOfRecords)
+      throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException {
     ClientResponse response = webResource.path(USER_TIMELINE_PATH)
                                          .queryParam("external_user_id",userName)
                                          .queryParam("offset", Integer.toString(offset))
@@ -153,6 +162,7 @@ public class EventHubClient {
 
     checkResponseCode(response,OK_RESPONSE);
     String entity = response.getEntity(String.class);
+    checkForBadBody(entity);
     Type collectionType = new TypeToken<Collection<Event>>(){}.getType();
     return gson.fromJson(entity,collectionType);
   }
@@ -205,6 +215,11 @@ public class EventHubClient {
     return extractFromBody(responseBody,String[].class);
   }
 
+  /**
+   * Tracks the given event
+   * @param event The event to track, must be NotNull
+   * @throws UnexpectedResponseCodeException Thrown if EventHub returns a non-OK response
+   */
   public void trackEvent(final Event event) throws UnexpectedResponseCodeException {
     WebResource resource = webResource.path(EVENT_TRACK_PATH)
                                       .queryParam("event_type", event.getEventType())

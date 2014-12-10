@@ -4,16 +4,10 @@ import com.google.gson.reflect.TypeToken;
 import org.junit.Test;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- *
- */
 public class EventSerializerTest extends EventSerializationTestBase {
   @Test
   public void testEventWith1Property() throws Exception {
