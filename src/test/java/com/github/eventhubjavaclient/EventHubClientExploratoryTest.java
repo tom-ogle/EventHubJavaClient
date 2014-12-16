@@ -8,6 +8,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.ws.rs.core.MultivaluedMap;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,12 @@ public class EventHubClientExploratoryTest  {
       String[] eventTypes = client.getEventTypes();
       String[] eventKeys = client.getEventKeys(eventTypes[1]);
       String[] eventValues = client.getEventValues(eventTypes[1],eventKeys[0]);
-
+      List<Event> events = new ArrayList<Event>();
+      Event event = new Event("signup", "chengtao1@codecademy.com", null);
+      Event event2 = new Event("pageview", "chengtao1@codecademy.com", null);
+      events.add(event);
+      events.add(event2);
+      client.batchTrackEvent(events);
       // Users
       String[] userKeys = client.getUserKeys();
       String[] userValues = client.getUserValues(userKeys[0]);
@@ -53,7 +59,7 @@ public class EventHubClientExploratoryTest  {
 
       Map<String, String> properties = new HashMap<String, String>();
       properties.put("experiment","signup_v50");
-      Event event = new Event("myeventtype","chengtao1@codecademy.com",properties);
+      event = new Event("myeventtype","chengtao1@codecademy.com",properties);
       client.trackEvent(event);
       System.out.printf("");
     } catch(UnexpectedResponseCodeException e) {

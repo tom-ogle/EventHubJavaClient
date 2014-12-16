@@ -84,14 +84,16 @@ public class EventHubClient {
   /**
    * Adds the user if they don't exist and updates their properties if they do exist.
    * @param userId The userID to update, must be NotNull
-   * @param userFieldValueMap The key-value pairs to attach to this user. Must be NotNull and should contain values.
+   * @param userFieldValueMap The key-value pairs to attach to this user.
    * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API
    */
   public void addOrUpdateUser(final String userId, final Map<String,String> userFieldValueMap) throws UnexpectedResponseCodeException {
     WebResource resource = webResource.path(USER_ADD_OR_UPDATE_PATH)
                                          .queryParam("external_user_id", userId);
-    for(Map.Entry<String, String> entry : userFieldValueMap.entrySet()) {
-      resource = resource.queryParam(entry.getKey(),entry.getValue());
+    if(userFieldValueMap!=null) {
+      for(Map.Entry<String, String> entry : userFieldValueMap.entrySet()) {
+        resource = resource.queryParam(entry.getKey(), entry.getValue());
+      }
     }
     ClientResponse response = resource.post(ClientResponse.class);
     checkResponseCode(response,OK_RESPONSE);
@@ -139,8 +141,8 @@ public class EventHubClient {
 
   /**
    *
-   * @param mapFromNewUserName The new name to map from.
-   * @param mapToExistingUserName The old user name to map to
+   * @param mapFromNewUserName The new name to map from. Must be NotNull.
+   * @param mapToExistingUserName The old user name to map to. Must be NotNull.
    * @throws UnexpectedResponseCodeException
    */
   public void aliasUser(final String mapFromNewUserName, final String mapToExistingUserName) throws UnexpectedResponseCodeException {
@@ -240,11 +242,10 @@ public class EventHubClient {
   }
 
   public void batchTrackEvent(final List<Event> events) throws UnexpectedResponseCodeException {
-    // TODO: Implement
-
+    final String requestBody = produceBatchEventsBody(events);
     ClientResponse response = webResource.path(EVENT_BATCH_TRACK_PATH)
                                          .header("Content-Type", "application/x-www-form-urlencoded")
-                                         .post(ClientResponse.class);
+                                         .post(ClientResponse.class, requestBody);
     checkResponseCode(response,OK_RESPONSE);
   }
 
@@ -286,6 +287,14 @@ public class EventHubClient {
   }
 
   // Utils
+
+
+  private String produceBatchEventsBody(final List<Event> events) {
+    StringBuilder sb = new StringBuilder("events=");
+    Type collectionType = new TypeToken<Collection<Event>>(){}.getType();
+    sb.append(gson.toJson(events, collectionType));
+    return sb.toString();
+  }
 
   private String produceEventCohortTableRequestBody(final DateTime startDate, final DateTime endDate, final String rowEventType,
       final String columnEventType, final int numberOfDaysPerRow, final int numberOfColumns, final Map<String, String> rowFilters,

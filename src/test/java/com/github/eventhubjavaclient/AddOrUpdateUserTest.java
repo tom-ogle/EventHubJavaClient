@@ -20,6 +20,12 @@ public class AddOrUpdateUserTest extends EventHubClientTestBase {
     client.addOrUpdateUser(USER_ID,properties);
   }
 
+  @Test
+  public void testShouldCompleteRequestSuccessfullyFor200ResponseWithNullMap() throws Exception {
+    mockClientResponse(200,SOME_STRING);
+    client.addOrUpdateUser(USER_ID,null);
+  }
+
   @Test(expected = UnexpectedResponseCodeException.class)
   public void testShouldThrowUnexpectedResponseCodeExceptionForNon200Response() throws Exception {
     Map<String, String> properties = createPropertiesMap();
