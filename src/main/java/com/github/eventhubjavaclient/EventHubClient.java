@@ -218,7 +218,7 @@ public class EventHubClient {
   }
 
   /**
-   * Tracks the given event
+   * Tracks the given event.
    * @param event The event to track, must be NotNull
    * @throws UnexpectedResponseCodeException Thrown if EventHub returns a non-OK response
    */
@@ -241,7 +241,12 @@ public class EventHubClient {
     checkResponseCode(response,OK_RESPONSE);
   }
 
-  public void batchTrackEvent(final List<Event> events) throws UnexpectedResponseCodeException {
+  /**
+   * Batch tracks all the provided events.
+   * @param events The events to track. Must be NotNull.
+   * @throws UnexpectedResponseCodeException Thrown if EventHub returns a non-OK response
+   */
+  public void batchTrackEvents(final List<Event> events) throws UnexpectedResponseCodeException {
     final String requestBody = produceBatchEventsBody(events);
     ClientResponse response = webResource.path(EVENT_BATCH_TRACK_PATH)
                                          .header("Content-Type", "application/x-www-form-urlencoded")
@@ -287,7 +292,6 @@ public class EventHubClient {
   }
 
   // Utils
-
 
   private String produceBatchEventsBody(final List<Event> events) {
     StringBuilder sb = new StringBuilder("events=");

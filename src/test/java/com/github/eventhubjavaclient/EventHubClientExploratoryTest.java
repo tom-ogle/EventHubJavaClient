@@ -2,12 +2,10 @@ package com.github.eventhubjavaclient;
 
 import com.github.eventhubjavaclient.event.Event;
 import com.github.eventhubjavaclient.exception.UnexpectedResponseCodeException;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.joda.time.DateTime;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +28,7 @@ public class EventHubClientExploratoryTest  {
       Event event2 = new Event("pageview", "chengtao1@codecademy.com", null);
       events.add(event);
       events.add(event2);
-      client.batchTrackEvent(events);
+      client.batchTrackEvents(events);
       // Users
       String[] userKeys = client.getUserKeys();
       String[] userValues = client.getUserValues(userKeys[0]);
