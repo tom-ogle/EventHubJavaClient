@@ -1,11 +1,17 @@
 package com.github.eventhubjavaclient.event;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+import net.javacrumbs.jsonunit.core.Option;
 import org.junit.Test;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
 
+import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
+import static net.javacrumbs.jsonunit.JsonAssert.when;
 import static org.junit.Assert.assertEquals;
 
 public class EventSerializerTest extends EventSerializationTestBase {
@@ -44,7 +50,7 @@ public class EventSerializerTest extends EventSerializationTestBase {
     Type collectionType = new TypeToken<Collection<Event>>(){}.getType();
     String actualJson = gson.toJson(ALL_EVENTS_SORTED_IN_JSON_ORDER, collectionType);
     String expectedJson = ALL_JSON_EVENTS;
-    assertEquals(removeWhiteSpace(expectedJson), actualJson);
+    assertJsonEquals(expectedJson,actualJson,when(Option.IGNORING_ARRAY_ORDER));
   }
 
   // Util
@@ -58,4 +64,5 @@ public class EventSerializerTest extends EventSerializationTestBase {
   private static String removeWhiteSpace(final String s) {
     return s.replaceAll("\\s+", "");
   }
+
 }

@@ -21,7 +21,7 @@ public class EventHubClientTestBase {
   @Mocked WebResource.Builder builder;
   @Mocked ClientResponse response;
 
-  protected void mockClientResponse(final int responseReturnCode, final String responseBody) {
+  protected void mockClientResponse(final int responseReturnCode, final String responseEntity) {
     new NonStrictExpectations(){{
       webResource.path(anyString); result = webResource;
       webResource.header(anyString,any); result = builder;
@@ -37,7 +37,7 @@ public class EventHubClientTestBase {
       webResource.post(ClientResponse.class); result = response;
       // Mock the response
       response.getStatus(); result = responseReturnCode;
-      response.getEntity(String.class); result = responseBody;
+      response.getEntity(String.class); result = responseEntity;
     }};
   }
 

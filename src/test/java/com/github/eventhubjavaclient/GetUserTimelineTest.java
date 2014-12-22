@@ -2,7 +2,9 @@ package com.github.eventhubjavaclient;
 
 import com.github.eventhubjavaclient.event.Event;
 import com.github.eventhubjavaclient.event.EventSerializationTestBase;
+import com.github.eventhubjavaclient.exception.BadlyFormedResponseBodyException;
 import com.github.eventhubjavaclient.exception.UnexpectedResponseCodeException;
+import com.google.gson.JsonSyntaxException;
 import mockit.integration.junit4.JMockit;
 import org.joda.time.DateTime;
 import org.junit.Test;
@@ -29,7 +31,6 @@ public class GetUserTimelineTest extends EventHubClientTestBase {
     List<Event> actualEvents = new ArrayList<Event>(actualEventsCollection);
     List<Event> expectedEvents = EventSerializationTestBase.ALL_EVENTS_SORTED_IN_JSON_ORDER;
     EventSerializationTestBase.assertThatListsOfEventsHaveSameValues(expectedEvents,actualEvents);
-
   }
 
   @Test(expected = UnexpectedResponseCodeException.class)
@@ -38,7 +39,23 @@ public class GetUserTimelineTest extends EventHubClientTestBase {
     client.getUserTimeline(USER_NAME,0,10);
   }
 
-  // TODO: Tests for bad json returned
+  @Test(expected = BadlyFormedResponseBodyException.class)
+  public void testShouldThrowBadlyFormedResponseBodyExceptionForNullEntity() throws Exception {
+    mockClientResponse(200, null);
+    client.getUserTimeline(USER_NAME,0,10);
+  }
+
+  @Test(expected = BadlyFormedResponseBodyException.class)
+  public void testShouldThrowBadlyFormedResponseBodyExceptionForEmptyStringEntity() throws Exception {
+    mockClientResponse(200, null);
+    client.getUserTimeline(USER_NAME,0,10);
+  }
+
+  @Test(expected = JsonSyntaxException.class)
+  public void testShouldThrowJsonSyntaxExceptionExceptionForBadJsonEntity() throws Exception {
+    mockClientResponse(200, "{");
+    client.getUserTimeline(USER_NAME,0,10);
+  }
 
   // Util
 

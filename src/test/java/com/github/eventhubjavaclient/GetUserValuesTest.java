@@ -1,6 +1,7 @@
 package com.github.eventhubjavaclient;
 
 import com.github.eventhubjavaclient.exception.BadlyFormedResponseBodyException;
+import com.github.eventhubjavaclient.exception.IllegalInputException;
 import com.github.eventhubjavaclient.exception.UnexpectedResponseCodeException;
 import mockit.NonStrictExpectations;
 import mockit.integration.junit4.JMockit;
@@ -99,7 +100,7 @@ public class GetUserValuesTest extends EventHubClientTestBase {
     client.getUserValues(SOME_STRING,prefixString);
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expected = IllegalInputException.class)
   public void testShouldThrowNPEForNullUserKeyInput() throws Exception {
     mockClientResponse(200,"[\"foo\"]");
     client.getUserValues(null);

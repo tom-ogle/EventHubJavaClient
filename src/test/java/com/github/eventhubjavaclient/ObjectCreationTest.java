@@ -15,14 +15,14 @@ public class ObjectCreationTest {
   private static final String BAD_URL = "some bad url";
 
   @Test
-  public void testFactoryMethodsProduceClient() throws Exception {
+  public void testCreationMethodsProduceClient() throws Exception {
 
-    EventHubClient factoryProducedClient  = EventHubClient.createDefaultClient(GOOD_URL);
-    assertNotNull("Factory method createDefaultClient returned a null client",factoryProducedClient);
+    EventHubClient producedClient  = EventHubClient.createDefaultClient(GOOD_URL);
+    assertNotNull("createDefaultClient returned a null client",producedClient);
 
     ClientConfig config = new DefaultClientConfig();
-    factoryProducedClient = EventHubClient.createCustomClient(GOOD_URL,config);
-    assertNotNull("Factory method createCustomClient returned a null client", factoryProducedClient);
+    producedClient = EventHubClient.createCustomClient(GOOD_URL,config);
+    assertNotNull("createCustomClient returned a null client", producedClient);
   }
 
   @Test(expected = IllegalArgumentException.class)

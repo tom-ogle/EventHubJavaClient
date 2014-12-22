@@ -3,6 +3,7 @@ package com.github.eventhubjavaclient;
 import com.github.eventhubjavaclient.event.Event;
 import com.github.eventhubjavaclient.event.EventDeserializer;
 import com.github.eventhubjavaclient.event.EventSerializer;
+import com.github.eventhubjavaclient.exception.IllegalInputException;
 import com.github.eventhubjavaclient.exception.BadlyFormedResponseBodyException;
 import com.github.eventhubjavaclient.exception.UnexpectedResponseCodeException;
 import com.google.gson.*;
@@ -12,11 +13,9 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.joda.time.DateTime;
 
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +29,11 @@ public class EventHubClient {
 
   // Static
 
+  /**
+   * Creates a client instance with a default config.
+   * @param baseUrl The base URL of the EventHub server e.g. http://localhost:<portnumber>
+   * @return The created client, using the provided URL and default config
+   */
   public static EventHubClient createDefaultClient(String baseUrl) {
     ClientConfig config = new DefaultClientConfig();
     return new EventHubClient(baseUrl, config);
@@ -86,8 +90,11 @@ public class EventHubClient {
    * @param userId The userID to update, must be NotNull
    * @param userFieldValueMap The key-value pairs to attach to this user.
    * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API
+   * @throws IllegalInputException Thrown if illegal input is provided (null userId).
    */
-  public void addOrUpdateUser(final String userId, final Map<String,String> userFieldValueMap) throws UnexpectedResponseCodeException {
+  public void addOrUpdateUser(final String userId, final Map<String,String> userFieldValueMap)
+      throws UnexpectedResponseCodeException, IllegalInputException {
+    checkNotNull(userId);
     WebResource resource = webResource.path(USER_ADD_OR_UPDATE_PATH)
                                          .queryParam("external_user_id", userId);
     if(userFieldValueMap!=null) {
@@ -118,15 +125,16 @@ public class EventHubClient {
    * Gets all key-value values over all the users.
    * @param userKey
    * @return
-   * @throws UnexpectedResponseCodeException
+   * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API
    * @throws BadlyFormedResponseBodyException
    */
-  public String[] getUserValues(final String userKey) throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException {
+  public String[] getUserValues(final String userKey)
+      throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException, IllegalInputException {
     return getUserValues(userKey,null);
   }
 
   public String[] getUserValues(final String userKey, final String prefix)
-      throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException {
+      throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException, IllegalInputException {
     checkNotNull(userKey);
     WebResource request = webResource.path(USER_VALUES_PATH)
                                      .queryParam("user_key",userKey);
@@ -140,15 +148,19 @@ public class EventHubClient {
   }
 
   /**
-   *
-   * @param mapFromNewUserName The new name to map from. Must be NotNull.
-   * @param mapToExistingUserName The old user name to map to. Must be NotNull.
-   * @throws UnexpectedResponseCodeException
+   * Creates an alias for a user.
+   * @param newUserName The new user name. Must be NotNull.
+   * @param existingUserName The old user name to map the new name to. Must be NotNull.
+   * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API
+   * @throws IllegalInputException Thrown if illegal input is provided (null new or old username)
    */
-  public void aliasUser(final String mapFromNewUserName, final String mapToExistingUserName) throws UnexpectedResponseCodeException {
+  public void aliasUser(final String newUserName, final String existingUserName)
+      throws UnexpectedResponseCodeException, IllegalInputException {
+    checkNotNull(newUserName);
+    checkNotNull(existingUserName);
     ClientResponse response = webResource.path(USER_ALIAS_PATH)
-                                         .queryParam("from_external_user_id", mapFromNewUserName)
-                                         .queryParam("to_external_user_id",mapToExistingUserName)
+                                         .queryParam("from_external_user_id", newUserName)
+                                         .queryParam("to_external_user_id",existingUserName)
                                          .accept(MediaType.WILDCARD_TYPE)
                                          .post(ClientResponse.class);
     checkResponseCode(response,OK_RESPONSE);
@@ -169,7 +181,17 @@ public class EventHubClient {
     return gson.fromJson(entity,collectionType);
   }
 
-  public List<String> getUsers(Map<String, String> filters) throws UnexpectedResponseCodeException {
+  /**
+   * Gets all users that match the provided filters.
+   * @param filters The filters to match. Must be NotNull.
+   * @return A list of user names.
+   * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API
+   * @throws BadlyFormedResponseBodyException
+   */
+  public List<String> getUsers(Map<String, String> filters)
+      throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException, IllegalInputException {
+    checkNotNull(filters);
+    checkNotEmpty(filters);
     String body = produceFiltersRequestBody(filters, "ufk[]", "ufv[]");
     ClientResponse response = webResource.path(USER_FIND_PATH)
                                          .header("Content-Type", "application/x-www-form-urlencoded")
@@ -181,7 +203,17 @@ public class EventHubClient {
 
   // Events
 
-  public String[] getEventKeys(final String eventType) throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException {
+  /**
+   * Gets the event keys for the provided event type.
+   * @param eventType The event type to get all event keys for. Must be notNull.
+   * @return An array of event keys as Strings.
+   * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API.
+   * @throws BadlyFormedResponseBodyException Thrown if the EventhUb API returns a badly formed response.
+   * @throws IllegalInputException Thrown if illegal input is provided (null event type).
+   */
+  public String[] getEventKeys(final String eventType)
+      throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException, IllegalInputException {
+    checkNotNull(eventType);
     ClientResponse response = webResource.path(EVENT_KEYS_PATH)
                                          .queryParam("event_type",eventType)
                                          .accept(MediaType.APPLICATION_JSON_TYPE)
@@ -206,7 +238,7 @@ public class EventHubClient {
   public String[] getEventValues(final String eventType, final String eventKey, final String prefix)
       throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException {
     WebResource request = webResource.path(EVENT_VALUES_PATH)
-                                     .queryParam("event_type",eventType)
+                                     .queryParam("event_type", eventType)
                                      .queryParam("event_key",eventKey);
     if(prefix!=null)
       request = request.queryParam("prefix",prefix);
@@ -220,7 +252,7 @@ public class EventHubClient {
   /**
    * Tracks the given event.
    * @param event The event to track, must be NotNull
-   * @throws UnexpectedResponseCodeException Thrown if EventHub returns a non-OK response
+   * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API
    */
   public void trackEvent(final Event event) throws UnexpectedResponseCodeException {
     WebResource resource = webResource.path(EVENT_TRACK_PATH)
@@ -243,10 +275,12 @@ public class EventHubClient {
 
   /**
    * Batch tracks all the provided events.
-   * @param events The events to track. Must be NotNull.
-   * @throws UnexpectedResponseCodeException Thrown if EventHub returns a non-OK response
+   * @param events The events to track. Must be NotNull and contain at least one event.
+   * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API
+   * @throws IllegalInputException Thrown if illegal input is provided (null or empty events list).
    */
-  public void batchTrackEvents(final List<Event> events) throws UnexpectedResponseCodeException {
+  public void batchTrackEvents(final List<Event> events) throws UnexpectedResponseCodeException, IllegalInputException {
+    checkNotEmpty(events);
     final String requestBody = produceBatchEventsBody(events);
     ClientResponse response = webResource.path(EVENT_BATCH_TRACK_PATH)
                                          .header("Content-Type", "application/x-www-form-urlencoded")
@@ -322,7 +356,10 @@ public class EventHubClient {
       userFilterKeys.append(keyArrayName).append("=").append(entry.getKey()).append("&");
       userFilterValues.append(valueArrayName).append("=").append(entry.getValue()).append("&");
     }
-    userFilterValues.deleteCharAt(userFilterValues.length()-1);
+    if(userFilterValues.length()!=0) {
+      // Remove the last ampersand
+      userFilterValues.deleteCharAt(userFilterValues.length() - 1);
+    }
     return userFilterKeys.toString()+userFilterValues.toString();
   }
 
@@ -369,14 +406,37 @@ public class EventHubClient {
     throw new UnexpectedResponseCodeException(expectedStatusArray,actualStatus);
   }
 
-  private static void checkNotNull(final Object obj) {
+  private static void checkNotNull(final Object obj) throws IllegalInputException {
     if(obj==null)
-      throw new NullPointerException("Expecting non null value");
+      throw new IllegalInputException("Expecting non null value");
   }
 
-  private List<String> extractUserNames(final String json) {
+  private static void checkNotEmpty(final Map map) throws IllegalInputException {
+    if(map==null)
+      throw new IllegalInputException("The provided map was null");
+    if(map.size()<1)
+      throw new IllegalInputException("The provided map was empty");
+  }
+
+  private static void checkNotEmpty(final List list) throws IllegalInputException {
+    if(list==null)
+      throw new IllegalInputException("The provided list was null");
+    if(list.size()<1)
+      throw new IllegalInputException("The provided list was empty");
+  }
+
+  private List<String> extractUserNames(final String json) throws BadlyFormedResponseBodyException {
     List<String> names = new ArrayList<String>();
-    JsonArray array = gson.fromJson(json,JsonArray.class);
+    JsonArray array = null;
+    try {
+      array = gson.fromJson(json, JsonArray.class);
+    } catch (JsonSyntaxException e) {
+      throw new BadlyFormedResponseBodyException("JSON in response body was badly formed", e);
+    } catch (ClassCastException e) {
+      throw new BadlyFormedResponseBodyException("JSON in response body was not in the expected format");
+    }
+    if(array==null)
+      throw new BadlyFormedResponseBodyException();
     for(JsonElement jsonElement : array) {
       JsonObject object = jsonElement.getAsJsonObject();
       names.add(object.get("external_user_id").getAsString());

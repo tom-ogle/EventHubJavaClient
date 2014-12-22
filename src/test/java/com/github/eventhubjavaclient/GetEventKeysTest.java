@@ -1,11 +1,15 @@
 package com.github.eventhubjavaclient;
 
 import com.github.eventhubjavaclient.exception.BadlyFormedResponseBodyException;
+import com.github.eventhubjavaclient.exception.IllegalInputException;
 import com.github.eventhubjavaclient.exception.UnexpectedResponseCodeException;
+import com.sun.jersey.api.client.ClientResponse;
 import mockit.NonStrictExpectations;
 import mockit.integration.junit4.JMockit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import javax.ws.rs.core.MediaType;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNull;
@@ -16,6 +20,20 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(JMockit.class)
 public class GetEventKeysTest extends EventHubClientTestBase {
+
+  @Test
+  public void testShouldAddQueryParamEventType() throws Exception {
+    final String eventType = "event type";
+    new NonStrictExpectations() {{
+      webResource.path(anyString); result = webResource;
+      webResource.queryParam("event_type", eventType); result = webResource; times = 1;
+      webResource.accept(withAny(MediaType.APPLICATION_JSON_TYPE)); result = builder;
+      builder.get(ClientResponse.class); result = response;
+      response.getStatus(); result = 200;
+      response.getEntity(String.class); result = "[\n  \"foo\",\n  \"hello\"\n]\n";
+    }};
+    client.getEventKeys(eventType);
+  }
 
   @Test
   public void testShouldExtractFromGoodJsonResponseWithNewlines() throws Exception {
@@ -87,5 +105,11 @@ public class GetEventKeysTest extends EventHubClientTestBase {
   public void testShouldThrowBadlyFormedResponseBodyExceptionForNullReturnBody() throws Exception {
     mockClientResponse(200,null);
     client.getEventKeys(SOME_STRING);
+  }
+
+  @Test(expected = IllegalInputException.class)
+  public void testShouldThrowIllegalInputExceptionForNullEventType() throws Exception {
+    mockClientResponse(200,"[\"foo\",\"hello\"]");
+    client.getEventKeys(null);
   }
 }

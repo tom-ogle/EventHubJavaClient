@@ -16,7 +16,6 @@ import static org.junit.Assert.assertTrue;
 @RunWith(JMockit.class)
 public class GetEventTypesTest extends EventHubClientTestBase {
 
-
   @Test
   public void testShouldExtractFromGoodJsonResponseWithNewlines() throws Exception {
     mockClientResponse(200, "[\n  \"pageview\",\n  \"signup\",\n  \"start_track\",\n  \"submission\"\n]\n");
