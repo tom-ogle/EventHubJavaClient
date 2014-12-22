@@ -1,7 +1,9 @@
 package com.github.eventhubjavaclient;
 
 import com.github.eventhubjavaclient.exception.BadlyFormedResponseBodyException;
+import com.github.eventhubjavaclient.exception.IllegalInputException;
 import com.github.eventhubjavaclient.exception.UnexpectedResponseCodeException;
+import com.sun.jersey.api.client.ClientResponse;
 import mockit.NonStrictExpectations;
 import mockit.integration.junit4.JMockit;
 import org.junit.Test;
@@ -11,9 +13,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-/**
- *
- */
 @RunWith(JMockit.class)
 public class GetEventValuesTest extends EventHubClientTestBase {
 
@@ -57,7 +56,7 @@ public class GetEventValuesTest extends EventHubClientTestBase {
   }
 
   @Test(expected = UnexpectedResponseCodeException.class)
-  public void testShouldThrowUnexpectedResponseCodeExceptionOn500Response() throws Exception {
+  public void testShouldThrowUnexpectedResponseCodeExceptionOnNon200Response() throws Exception {
     mockClientResponse(500,null);
 
     client.getEventValues(SOME_STRING,SOME_STRING);
@@ -98,5 +97,31 @@ public class GetEventValuesTest extends EventHubClientTestBase {
     }};
 
     client.getEventValues(SOME_STRING,SOME_STRING,prefixString);
+  }
+
+  @Test(expected = IllegalInputException.class)
+  public void testShouldThrowIllegalInputExceptionForNullEventType() throws Exception {
+    mockClientResponse(200, null);
+    client.getEventValues(null, SOME_STRING);
+  }
+
+  @Test(expected = IllegalInputException.class)
+  public void testShouldThrowIllegalInputExceptionForNullEventKey() throws Exception {
+    mockClientResponse(200, null);
+    client.getEventValues(SOME_STRING, null);
+  }
+
+  @Test
+  public void testShouldNotSetPrefixQueryParamWithNullPrefix() throws Exception {
+    new NonStrictExpectations() {{
+      webResource.path(anyString); result = webResource;
+      webResource.queryParam("prefix",anyString); result = webResource; times = 0;
+      webResource.queryParam("event_type",anyString); result = webResource;
+      webResource.queryParam("event_key",anyString); result = webResource;
+      webResource.get(ClientResponse.class); result = response;
+      response.getStatus(); result = 200;
+      response.getEntity(String.class); result = "[\"foo\"]";
+    }};
+    client.getEventValues(SOME_STRING, SOME_STRING, null);
   }
 }

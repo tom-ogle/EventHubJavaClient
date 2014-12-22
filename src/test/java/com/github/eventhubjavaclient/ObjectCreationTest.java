@@ -26,12 +26,12 @@ public class ObjectCreationTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testcreateDefaultClientShouldThrowIllegalArgumentExceptionForBadUrl() throws Exception {
+  public void testCreateDefaultClientShouldThrowIllegalArgumentExceptionForBadUrl() throws Exception {
     EventHubClient.createDefaultClient(BAD_URL);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testcreateCustomClientShouldThrowIllegalArgumentExceptionForBadUrl() throws Exception {
+  public void testCreateCustomClientShouldThrowIllegalArgumentExceptionForBadUrl() throws Exception {
     ClientConfig config = new DefaultClientConfig();
     EventHubClient.createCustomClient(BAD_URL, config);
   }

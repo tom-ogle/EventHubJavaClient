@@ -12,9 +12,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Tests for the getUserValues method.
- */
 @RunWith(JMockit.class)
 public class GetUserValuesTest extends EventHubClientTestBase {
 

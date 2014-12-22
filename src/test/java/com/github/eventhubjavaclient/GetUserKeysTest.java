@@ -8,9 +8,6 @@ import org.junit.runner.RunWith;
 
 import static org.junit.Assert.*;
 
-/**
- * Tests for the getUserKeys method.
- */
 @RunWith(JMockit.class)
 public class GetUserKeysTest extends EventHubClientTestBase {
 

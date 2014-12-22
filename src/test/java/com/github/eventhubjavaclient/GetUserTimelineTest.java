@@ -3,6 +3,7 @@ package com.github.eventhubjavaclient;
 import com.github.eventhubjavaclient.event.Event;
 import com.github.eventhubjavaclient.event.EventSerializationTestBase;
 import com.github.eventhubjavaclient.exception.BadlyFormedResponseBodyException;
+import com.github.eventhubjavaclient.exception.IllegalInputException;
 import com.github.eventhubjavaclient.exception.UnexpectedResponseCodeException;
 import com.google.gson.JsonSyntaxException;
 import mockit.integration.junit4.JMockit;
@@ -57,17 +58,9 @@ public class GetUserTimelineTest extends EventHubClientTestBase {
     client.getUserTimeline(USER_NAME,0,10);
   }
 
-  // Util
-
-  private static Collection<Event> createUserTimeline() {
-    Collection<Event> timeline = new ArrayList<Event>();
-    final String eventType = "some event type";
-    final String externalUserId = "externalUserId";
-    DateTime dateTime = new DateTime(2014,12,11,0,0);
-    Map<String, String> properties = new HashMap<String, String>();
-    properties.put("property1", "value1");
-    timeline.add(new Event(eventType,externalUserId,dateTime,properties));
-    return timeline;
+  @Test(expected = IllegalInputException.class)
+  public void testShouldThrowIllegalInputExceptionForNullUserName() throws Exception {
+    mockClientResponse(200,EventSerializationTestBase.ALL_JSON_EVENTS);
+    client.getUserTimeline(null,0,10);
   }
-
 }

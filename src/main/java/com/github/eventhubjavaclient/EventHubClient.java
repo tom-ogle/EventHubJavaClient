@@ -110,7 +110,7 @@ public class EventHubClient {
    * Gets all key-value keys over all the users.
    * @return The user keys, guaranteed not null.
    * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API
-   * @throws BadlyFormedResponseBodyException Thrown if the response body was not a well-formed JSON array
+   * @throws BadlyFormedResponseBodyException Thrown if the response body was not a well-formed JSON array.
    */
   public String[] getUserKeys() throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException {
     ClientResponse response = webResource.path(USER_KEYS_PATH)
@@ -122,17 +122,27 @@ public class EventHubClient {
   }
 
   /**
-   * Gets all key-value values over all the users.
-   * @param userKey
-   * @return
-   * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API
-   * @throws BadlyFormedResponseBodyException
+   * Gets all values for the given key from the set of all user key-value pairs (over every user).
+   * @param userKey The key to find all values for.
+   * @return All values for the given key, irrespective of which user the key-valiue pair is registered for.
+   * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API.
+   * @throws BadlyFormedResponseBodyException Thrown if the response body was not a well-formed JSON array.
+   * @throws IllegalInputException Thrown if illegal input is provided (null username).
    */
   public String[] getUserValues(final String userKey)
       throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException, IllegalInputException {
-    return getUserValues(userKey,null);
+    return getUserValues(userKey, null);
   }
 
+  /**
+   * Gets all values for the given key from the set of all user key-value pairs (over every user), fltered using the given prefix.
+   * @param userKey The key to find all values for.
+   * @param prefix The prefix to filter the values by. No filter will be applied if set to null.
+   * @return The filtered values for the given key, irrespective of which user the key-valiue pair is registered for.
+   * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API.
+   * @throws BadlyFormedResponseBodyException Thrown if the response body was not a well-formed JSON array.
+   * @throws IllegalInputException Thrown if illegal input is provided (null username).
+   */
   public String[] getUserValues(final String userKey, final String prefix)
       throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException, IllegalInputException {
     checkNotNull(userKey);
@@ -144,7 +154,7 @@ public class EventHubClient {
     ClientResponse response = request.get(ClientResponse.class);
     checkResponseCode(response,OK_RESPONSE);
     String responseBody = response.getEntity(String.class);
-    return extractFromBody(responseBody,String[].class);
+    return extractFromBody(responseBody, String[].class);
   }
 
   /**
@@ -152,7 +162,7 @@ public class EventHubClient {
    * @param newUserName The new user name. Must be NotNull.
    * @param existingUserName The old user name to map the new name to. Must be NotNull.
    * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API
-   * @throws IllegalInputException Thrown if illegal input is provided (null new or old username)
+   * @throws IllegalInputException Thrown if illegal input is provided (null new or existing username).
    */
   public void aliasUser(final String newUserName, final String existingUserName)
       throws UnexpectedResponseCodeException, IllegalInputException {
@@ -166,8 +176,19 @@ public class EventHubClient {
     checkResponseCode(response,OK_RESPONSE);
   }
 
+  /**
+   * Gets events for the given user.
+   * @param userName The user to get the events for.
+   * @param offset The offset in the server results to start from.
+   * @param numberOfRecords The number of Event records to return.
+   * @return The specified events for the given user as a collection of Events.
+   * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API.
+   * @throws BadlyFormedResponseBodyException Thrown if the response body was not a well-formed JSON array.
+   * @throws IllegalInputException Thrown if illegal input is provided (null username).
+   */
   public Collection<Event> getUserTimeline(final String userName, final int offset, final int numberOfRecords)
-      throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException {
+      throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException, IllegalInputException {
+    checkNotNull(userName);
     ClientResponse response = webResource.path(USER_TIMELINE_PATH)
                                          .queryParam("external_user_id",userName)
                                          .queryParam("offset", Integer.toString(offset))
@@ -208,14 +229,14 @@ public class EventHubClient {
    * @param eventType The event type to get all event keys for. Must be notNull.
    * @return An array of event keys as Strings.
    * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API.
-   * @throws BadlyFormedResponseBodyException Thrown if the EventhUb API returns a badly formed response.
+   * @throws BadlyFormedResponseBodyException Thrown if the EventHub API returns a badly formed response.
    * @throws IllegalInputException Thrown if illegal input is provided (null event type).
    */
   public String[] getEventKeys(final String eventType)
       throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException, IllegalInputException {
     checkNotNull(eventType);
     ClientResponse response = webResource.path(EVENT_KEYS_PATH)
-                                         .queryParam("event_type",eventType)
+                                         .queryParam("event_type", eventType)
                                          .accept(MediaType.APPLICATION_JSON_TYPE)
                                          .get(ClientResponse.class);
     checkResponseCode(response,OK_RESPONSE);
@@ -223,38 +244,69 @@ public class EventHubClient {
     return extractFromBody(responseBody,String[].class);
   }
 
+  /**
+   * Gets all event types.
+   * @return An array of all event types, as Strings.
+   * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API.
+   * @throws BadlyFormedResponseBodyException Thrown if the EventhUb API returns a badly formed response.
+   */
   public String[] getEventTypes() throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException {
-    ClientResponse response = webResource.path(EVENT_TYPES_PATH).accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
+    ClientResponse response = webResource.path(EVENT_TYPES_PATH)
+                                         .accept(MediaType.APPLICATION_JSON_TYPE)
+                                         .get(ClientResponse.class);
     checkResponseCode(response,OK_RESPONSE);
     String responseBody = response.getEntity(String.class);
-    return extractFromBody(responseBody,String[].class);
+    return extractFromBody(responseBody, String[].class);
   }
 
+  /**
+   * Gets all event values for the given event type and key.
+   * @param eventType The event type.
+   * @param eventKey The event key.
+   * @return Returns all event values for the given event type and key as an array of Strings.
+   * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API.
+   * @throws BadlyFormedResponseBodyException Thrown if the EventHub API returns a badly formed response.
+   * @throws IllegalInputException Thrown if illegal input is provided (null event type).
+   */
   public String[] getEventValues(final String eventType, final String eventKey)
-      throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException {
+      throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException, IllegalInputException {
     return getEventValues(eventType,eventKey,null);
   }
 
+  /**
+   * Gets all event values for the given event type and key with the given prefix.
+   * @param eventType The event type.
+   * @param eventKey The event key.
+   * @param prefix The prefix to filter event values by.
+   * @return Returns all event values for the given event type and key, with the given prefix, as an array of Strings.
+   * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API.
+   * @throws BadlyFormedResponseBodyException Thrown if the EventHub API returns a badly formed response.
+   * @throws IllegalInputException Thrown if illegal input is provided (null event type or event key).
+   */
   public String[] getEventValues(final String eventType, final String eventKey, final String prefix)
-      throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException {
+      throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException, IllegalInputException {
+    checkNotNull(eventType);
+    checkNotNull(eventKey);
     WebResource request = webResource.path(EVENT_VALUES_PATH)
                                      .queryParam("event_type", eventType)
                                      .queryParam("event_key",eventKey);
     if(prefix!=null)
-      request = request.queryParam("prefix",prefix);
+      request = request.queryParam("prefix", prefix);
 
     ClientResponse response = request.get(ClientResponse.class);
     checkResponseCode(response,OK_RESPONSE);
     String responseBody = response.getEntity(String.class);
-    return extractFromBody(responseBody,String[].class);
+    return extractFromBody(responseBody, String[].class);
   }
 
   /**
    * Tracks the given event.
    * @param event The event to track, must be NotNull
-   * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API
+   * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API.
+   * @throws IllegalInputException Thrown if illegal input is provided (null event).
    */
-  public void trackEvent(final Event event) throws UnexpectedResponseCodeException {
+  public void trackEvent(final Event event) throws UnexpectedResponseCodeException, IllegalInputException {
+    checkNotNull(event);
     WebResource resource = webResource.path(EVENT_TRACK_PATH)
                                       .queryParam("event_type", event.getEventType())
                                       .queryParam("external_user_id", event.getExternalUserId());
@@ -306,7 +358,12 @@ public class EventHubClient {
   // Event funnel
 
   public int[] retrieveEventFunnelCounts(final DateTime startDate, final DateTime endDate, final String[] funnelSteps,
-      final int daysToCompleteFunnel) throws BadlyFormedResponseBodyException, UnexpectedResponseCodeException {
+      final int daysToCompleteFunnel) throws BadlyFormedResponseBodyException, UnexpectedResponseCodeException, IllegalInputException {
+    checkNotNull(startDate);
+    checkNotNull(endDate);
+    checkNotEmpty(funnelSteps);
+    if(daysToCompleteFunnel<1)
+      throw new IllegalInputException("Expected days to complete funnel to be greater than 0, but was "+daysToCompleteFunnel);
 
     String body = produceEventFunnelCountsRequestBody(startDate, endDate, funnelSteps, daysToCompleteFunnel);
     ClientResponse response = webResource.path(EVENT_FUNNEL_PATH)
@@ -318,6 +375,11 @@ public class EventHubClient {
     return extractFromBody(responseBody,int[].class);
   }
 
+  /**
+   * Retrieves the server stats from the EventHub API.
+   * @return The server stats, as a String.
+   * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API.
+   */
   public String getServerStats() throws UnexpectedResponseCodeException {
     ClientResponse response = webResource.path(SERVER_STATS_PATH)
                                          .get(ClientResponse.class);
@@ -423,6 +485,13 @@ public class EventHubClient {
       throw new IllegalInputException("The provided list was null");
     if(list.size()<1)
       throw new IllegalInputException("The provided list was empty");
+  }
+
+  private static <T> void checkNotEmpty(T[] array) throws IllegalInputException {
+    if(array==null)
+      throw new IllegalInputException("The provided array was null");
+    if(array.length<1)
+      throw new IllegalInputException("The provided array was empty");
   }
 
   private List<String> extractUserNames(final String json) throws BadlyFormedResponseBodyException {

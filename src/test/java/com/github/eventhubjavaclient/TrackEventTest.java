@@ -1,6 +1,7 @@
 package com.github.eventhubjavaclient;
 
 import com.github.eventhubjavaclient.event.Event;
+import com.github.eventhubjavaclient.exception.IllegalInputException;
 import com.github.eventhubjavaclient.exception.UnexpectedResponseCodeException;
 import mockit.integration.junit4.JMockit;
 import org.joda.time.DateTime;
@@ -17,33 +18,37 @@ public class TrackEventTest extends EventHubClientTestBase {
   public void testShouldCompleteRequestSuccessfullyFor200Response() throws Exception {
     Event event = createEvent();
     mockClientResponse(200,SOME_STRING);
-    makeClientRequest(event);
+    client.trackEvent(event);
   }
 
   @Test(expected = UnexpectedResponseCodeException.class)
   public void testShouldThrowUnexpectedResponseCodeExceptionForNon200Response() throws Exception {
     Event event = createEvent();
     mockClientResponse(500,SOME_STRING);
-    makeClientRequest(event);
+    client.trackEvent(event);
   }
 
   @Test
   public void testShouldCompleteRequestSuccessfullyFor200ResponseWithNoDateInEvent() throws Exception {
     Event event = createEventNoDate();
     mockClientResponse(200,SOME_STRING);
-    makeClientRequest(event);
+    client.trackEvent(event);
   }
 
   @Test
   public void testShouldCompleteRequestSuccessfullyFor200ResponseWithNullPropertiesInEvent() throws Exception {
     Event event = createEventNullProperties();
     mockClientResponse(200,SOME_STRING);
-    makeClientRequest(event);
-  }
-
-  private void makeClientRequest(final Event event) throws UnexpectedResponseCodeException {
     client.trackEvent(event);
   }
+
+  @Test
+  public void testShouldThrowIllegalInputExceptionForNullEvent() throws Exception {
+    mockClientResponse(200,SOME_STRING);
+    client.trackEvent(null);
+  }
+
+  // Util
 
   private static Event createEvent() {
     final String eventType = "eventType";
