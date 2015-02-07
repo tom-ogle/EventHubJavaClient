@@ -13,7 +13,6 @@ import org.junit.runner.RunWith;
 import javax.ws.rs.core.MediaType;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertNull;
 
 @RunWith(JMockit.class)
 public class RetrieveEventFunnelCountsTest extends EventHubClientTestBase {

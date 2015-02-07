@@ -1,8 +1,5 @@
 package com.github.eventhubjavaclient.event;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import net.javacrumbs.jsonunit.core.Option;
 import org.junit.Test;

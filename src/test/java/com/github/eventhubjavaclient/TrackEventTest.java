@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.ws.rs.core.MediaType;
-import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 

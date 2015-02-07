@@ -8,7 +8,6 @@ import mockit.integration.junit4.JMockit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.print.attribute.standard.Media;
 import javax.ws.rs.core.MediaType;
 
 @RunWith(JMockit.class)

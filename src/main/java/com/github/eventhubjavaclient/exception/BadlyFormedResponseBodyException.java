@@ -1,8 +1,5 @@
 package com.github.eventhubjavaclient.exception;
 
-/**
- *
- */
 public class BadlyFormedResponseBodyException extends Exception {
   public BadlyFormedResponseBodyException() {
   }

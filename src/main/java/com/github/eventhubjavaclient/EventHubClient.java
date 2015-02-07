@@ -22,9 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import static com.github.eventhubjavaclient.EventHubClientUtils.EVENT_HUB_DATE_FORMATTER;
-/**
- *
- */
+
 public class EventHubClient {
 
   // Static

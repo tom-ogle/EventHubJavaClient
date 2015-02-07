@@ -7,7 +7,6 @@ import com.github.eventhubjavaclient.exception.IllegalInputException;
 import com.github.eventhubjavaclient.exception.UnexpectedResponseCodeException;
 import com.google.gson.JsonSyntaxException;
 import mockit.integration.junit4.JMockit;
-import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 

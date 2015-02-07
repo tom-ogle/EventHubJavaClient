@@ -1,8 +1,5 @@
 package com.github.eventhubjavaclient.exception;
 
-/**
- *
- */
 public class UnexpectedResponseCodeException extends Exception {
 
   private int[] expectedCodeArray;

@@ -1,7 +1,6 @@
 package com.github.eventhubjavaclient;
 
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.PartialRequestBuilder;
 import com.sun.jersey.api.client.WebResource;
 import mockit.Mocked;
 import mockit.NonStrictExpectations;
