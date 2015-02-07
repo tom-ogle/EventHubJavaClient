@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * Encapsulates an event.
  */
 public class Event {
   private final String eventType;

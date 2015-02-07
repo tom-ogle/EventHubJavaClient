@@ -14,15 +14,7 @@ import static com.github.eventhubjavaclient.EventHubClientUtils.EVENT_HUB_DATE_F
 import static com.github.eventhubjavaclient.event.EventDeserializer.KEY_DATE;
 import static com.github.eventhubjavaclient.event.EventDeserializer.KEY_EVENT_TYPE;
 import static com.github.eventhubjavaclient.event.EventDeserializer.KEY_EXTERNAL_USER_ID;
-/**
- *{
- external_user_id: 'chengtao1@codecademy.com',
- event_type: 'pageview',
- experiment: 'homepage_v1',
- treatment: 'new console',
- page: 'home'
- }
- */
+
 public class EventSerializer implements JsonSerializer<Event> {
 
   @Override public JsonElement serialize(final Event event, final Type type, final JsonSerializationContext jsonSerializationContext) {

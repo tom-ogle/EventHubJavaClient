@@ -14,6 +14,8 @@ import javax.ws.rs.core.MediaType;
 public class EventHubClientTestBase {
 
   protected static final String SOME_STRING = "some string"; // use this where the value doesn't matter
+  private static final Integer CONNECTION_TIMEOUT = 60000;
+  private static final Integer READ_TIMEOUT = 60000;
 
   protected EventHubClient client;
   @Mocked WebResource webResource;
@@ -42,6 +44,6 @@ public class EventHubClientTestBase {
 
   @Before
   public void setUp() {
-    client = EventHubClient.createDefaultClient("http://acceptableurl");
+    client = EventHubClient.createDefaultClient("http://acceptableurl", CONNECTION_TIMEOUT, READ_TIMEOUT);
   }
 }

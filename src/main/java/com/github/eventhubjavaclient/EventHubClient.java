@@ -36,22 +36,25 @@ public class EventHubClient {
   /**
    * Creates a client instance with a default config.
    * @param baseUrl The base URL of the EventHub server e.g. http://localhost:<portnumber>
+   * @param connectionTimeout Timeout for making the initial connection
+   * @param readTimeout Timeout for reading data
    * @return The created client, using the provided URL and default config
    */
-  public static EventHubClient createDefaultClient(String baseUrl) {
+  public static EventHubClient createDefaultClient(String baseUrl, Integer connectionTimeout, Integer readTimeout ) {
     ClientConfig config = new DefaultClientConfig();
-    return new EventHubClient(baseUrl, config);
+    return new EventHubClient(baseUrl, config, connectionTimeout, readTimeout);
   }
 
   /**
    * Creates a custom EventHubClient with the provided config
    * @param baseUrl The base URL of the EventHub server e.g. http://localhost:<portnumber>
    * @param config The configuration to provide to provide to the client
-   * @return The created client, using the provided URL and config
+   * @param connectionTimeout Timeout for making the initial connection
+   * @param readTimeout Timeout for reading data
    * @return The created client, using the provided URL and config
    */
-  public static EventHubClient createCustomClient(String baseUrl, ClientConfig config) {
-    return new EventHubClient(baseUrl, config);
+  public static EventHubClient createCustomClient(String baseUrl, Integer connectionTimeout, Integer readTimeout, ClientConfig config) {
+    return new EventHubClient(baseUrl, config, connectionTimeout, readTimeout);
   }
 
   private static final String USER_KEYS_PATH = "/users/keys";
@@ -78,8 +81,10 @@ public class EventHubClient {
   private WebResource webResource;
   private Gson gson;
 
-  private EventHubClient(String baseUrl, ClientConfig config) {
+  private EventHubClient(String baseUrl, ClientConfig config, Integer connectionTimeout, Integer readTimeout) {
     Client client = Client.create(config);
+    client.setConnectTimeout(connectionTimeout);
+    client.setReadTimeout(readTimeout);
     webResource = client.resource(baseUrl);
     GsonBuilder gsonBuilder = new GsonBuilder();
     gsonBuilder.registerTypeAdapter(Event.class, new EventDeserializer());
