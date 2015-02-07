@@ -7,6 +7,7 @@ EventHubJavaClient is based on Jersey and has been tested with Java SE6 and abov
 
 To instantiate a client:
 
+```
 // Replace these values with your EventHub server details
 int portnumber = 8080;
 String url = "http://localhost:" + portNumber;
@@ -22,5 +23,6 @@ Config config = new DefaultClientConfig();
 // Call methods on config to configure the client, as per usual Jersey client configuration
 // See https://jersey.java.net for further details
 EventHubClient client = EventHubClient.createCustomClient(url, connectionTimeout, readTimeout, config);
+```
 
-
+You can then call methods on the client to access the EventHub server end points.
