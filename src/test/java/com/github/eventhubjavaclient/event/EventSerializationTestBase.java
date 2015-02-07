@@ -5,7 +5,13 @@ import com.google.gson.GsonBuilder;
 import org.joda.time.DateTime;
 import org.junit.Before;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import static com.github.eventhubjavaclient.EventHubClientUtils.EVENT_HUB_DATE_FORMATTER;
 import static java.lang.String.format;

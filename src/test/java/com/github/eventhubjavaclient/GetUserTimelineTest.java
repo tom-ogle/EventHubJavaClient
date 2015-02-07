@@ -10,7 +10,9 @@ import mockit.integration.junit4.JMockit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @RunWith(JMockit.class)
 public class GetUserTimelineTest extends EventHubClientTestBase {

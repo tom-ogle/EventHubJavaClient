@@ -3,10 +3,15 @@ package com.github.eventhubjavaclient;
 import com.github.eventhubjavaclient.event.Event;
 import com.github.eventhubjavaclient.event.EventDeserializer;
 import com.github.eventhubjavaclient.event.EventSerializer;
-import com.github.eventhubjavaclient.exception.IllegalInputException;
 import com.github.eventhubjavaclient.exception.BadlyFormedResponseBodyException;
+import com.github.eventhubjavaclient.exception.IllegalInputException;
 import com.github.eventhubjavaclient.exception.UnexpectedResponseCodeException;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -21,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
 import static com.github.eventhubjavaclient.EventHubClientUtils.EVENT_HUB_DATE_FORMATTER;
 
 public class EventHubClient {

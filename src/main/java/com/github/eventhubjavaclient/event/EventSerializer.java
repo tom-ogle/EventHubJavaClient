@@ -1,15 +1,19 @@
 package com.github.eventhubjavaclient.event;
 
-import com.google.gson.*;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import org.joda.time.DateTime;
 
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import static com.github.eventhubjavaclient.EventHubClientUtils.EVENT_HUB_DATE_FORMATTER;
+import static com.github.eventhubjavaclient.event.EventDeserializer.KEY_DATE;
 import static com.github.eventhubjavaclient.event.EventDeserializer.KEY_EVENT_TYPE;
 import static com.github.eventhubjavaclient.event.EventDeserializer.KEY_EXTERNAL_USER_ID;
-import static com.github.eventhubjavaclient.event.EventDeserializer.KEY_DATE;
-import static com.github.eventhubjavaclient.EventHubClientUtils.EVENT_HUB_DATE_FORMATTER;
 /**
  *{
  external_user_id: 'chengtao1@codecademy.com',
