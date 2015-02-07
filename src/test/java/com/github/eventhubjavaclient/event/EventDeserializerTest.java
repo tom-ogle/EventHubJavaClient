@@ -1,20 +1,13 @@
 package com.github.eventhubjavaclient.event;
 
 import com.google.gson.reflect.TypeToken;
-import org.joda.time.DateTime;
 import org.junit.Test;
 
 import java.lang.reflect.Type;
 import java.util.*;
 
-import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
-import static com.github.eventhubjavaclient.EventHubClientUtils.EVENT_HUB_DATE_FORMATTER;
-import static org.junit.Assert.assertNull;
 
-/**
- *
- */
 public class EventDeserializerTest extends EventSerializationTestBase {
 
   @Test

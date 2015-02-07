@@ -307,9 +307,14 @@ public class EventHubClient {
    */
   public void trackEvent(final Event event) throws UnexpectedResponseCodeException, IllegalInputException {
     checkNotNull(event);
+    String eventType = event.getEventType();
+    checkNotNull(eventType);
+    String externalUserId = event.getExternalUserId();
+    checkNotNull(externalUserId);
+
     WebResource resource = webResource.path(EVENT_TRACK_PATH)
-                                      .queryParam("event_type", event.getEventType())
-                                      .queryParam("external_user_id", event.getExternalUserId());
+                                      .queryParam("event_type", eventType)
+                                      .queryParam("external_user_id", externalUserId);
     DateTime date = event.getDate();
     if(date!=null)
       resource = resource.queryParam("date", date.toString(EVENT_HUB_DATE_FORMATTER));
@@ -343,10 +348,21 @@ public class EventHubClient {
   // Event cohort
 
   public int[][] retrieveEventCohortTable(final DateTime startDate, final DateTime endDate, final String rowEventType,
-      final String columnEventType, final int numberOfDaysPerRow, final int numberOfDaysPerColumn, final Map<String, String> rowfilters,
-      final Map<String, String> columnFilters) throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException {
+      final String columnEventType, final int numberOfDaysPerRow, final int numberOfDaysPerColumn, final Map<String, String> rowFilters,
+      final Map<String, String> columnFilters)
+      throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException, IllegalInputException {
+
+    checkNotNull(startDate);
+    checkNotNull(endDate);
+    checkNotNull(rowEventType);
+    checkNotNull(columnEventType);
+    checkNotNull(rowFilters);
+    checkNotNull(columnFilters);
+    checkNotZero(numberOfDaysPerRow);
+    checkNotZero(numberOfDaysPerColumn);
+
     String body = produceEventCohortTableRequestBody(startDate,endDate,rowEventType,columnEventType,numberOfDaysPerRow,
-        numberOfDaysPerColumn,rowfilters,columnFilters);
+        numberOfDaysPerColumn,rowFilters,columnFilters);
     ClientResponse response = webResource.path(EVENT_COHORT_PATH)
                                          .header("Content-Type", "application/x-www-form-urlencoded")
                                          .post(ClientResponse.class, body);
@@ -487,11 +503,16 @@ public class EventHubClient {
       throw new IllegalInputException("The provided list was empty");
   }
 
-  private static <T> void checkNotEmpty(T[] array) throws IllegalInputException {
+  private static <T> void checkNotEmpty(final T[] array) throws IllegalInputException {
     if(array==null)
       throw new IllegalInputException("The provided array was null");
     if(array.length<1)
       throw new IllegalInputException("The provided array was empty");
+  }
+
+  private static void checkNotZero(final int number) throws IllegalInputException {
+    if(number == 0)
+      throw new IllegalInputException("Zero is not a valid input value");
   }
 
   private List<String> extractUserNames(final String json) throws BadlyFormedResponseBodyException {
