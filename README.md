@@ -1,7 +1,7 @@
 EventHubJavaClient
 ==================
 
-This project is a Java HTTP client for the EventHub server from the EventHub project (https://github.com/Codecademy/EventHub) developed by Codecademy.
+This project is a Java HTTP client for accessing the EventHub server from the EventHub project (https://github.com/Codecademy/EventHub) developed by Codecademy.
 
 EventHubJavaClient is based on Jersey and has been tested with Java SE6 and above.
 
