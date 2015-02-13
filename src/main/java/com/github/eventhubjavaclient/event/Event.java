@@ -2,6 +2,7 @@ package com.github.eventhubjavaclient.event;
 
 import org.joda.time.DateTime;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,7 +12,10 @@ import java.util.Set;
 /**
  * Encapsulates an event.
  */
-public class Event {
+public class Event implements Serializable {
+
+  private static final long serialVersionUID = -6188919075614861661L;
+
   private final String eventType;
   private final String externalUserId;
   private DateTime date;
