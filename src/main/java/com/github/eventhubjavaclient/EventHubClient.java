@@ -35,7 +35,7 @@ public class EventHubClient {
 
   /**
    * Creates a client instance with a default config.
-   * @param baseUrl The base URL of the EventHub server e.g. http://localhost:<portnumber>
+   * @param baseUrl The base URL of the EventHub server e.g. http://localhost:portnumber
    * @param connectionTimeout Timeout for making the initial connection
    * @param readTimeout Timeout for reading data
    * @return The created client, using the provided URL and default config
@@ -47,7 +47,7 @@ public class EventHubClient {
 
   /**
    * Creates a custom EventHubClient with the provided config
-   * @param baseUrl The base URL of the EventHub server e.g. http://localhost:<portnumber>
+   * @param baseUrl The base URL of the EventHub server e.g. http://localhost:portnumber
    * @param config The configuration to provide to provide to the client
    * @param connectionTimeout Timeout for making the initial connection
    * @param readTimeout Timeout for reading data
@@ -216,7 +216,8 @@ public class EventHubClient {
    * @param filters The filters to match. Must be NotNull.
    * @return A list of user names.
    * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API
-   * @throws BadlyFormedResponseBodyException
+   * @throws BadlyFormedResponseBodyException Thrown if the EventHub API returns a badly formed response.
+   * @throws IllegalInputException Thrown if illegal input is provided
    */
   public List<String> getUsers(Map<String, String> filters)
       throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException, IllegalInputException {
@@ -257,7 +258,7 @@ public class EventHubClient {
    * Gets all event types.
    * @return An array of all event types, as Strings.
    * @throws UnexpectedResponseCodeException Thrown if we got anything other than a 200 OK response from the EventHub API.
-   * @throws BadlyFormedResponseBodyException Thrown if the EventhUb API returns a badly formed response.
+   * @throws BadlyFormedResponseBodyException Thrown if the EventHub API returns a badly formed response.
    */
   public String[] getEventTypes() throws UnexpectedResponseCodeException, BadlyFormedResponseBodyException {
     ClientResponse response = webResource.path(EVENT_TYPES_PATH)
